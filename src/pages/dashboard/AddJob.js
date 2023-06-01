@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FormRow, FormRowSelect } from "../../components";
 import Wrapper from "../../assets/wrappers/DashboardFormPage";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
+import {
+  handleChange,
+  clearValue,
+  createJob,
+} from "../../features/job/jobSlice";
 
 const AddJob = () => {
   // getting job state values
@@ -20,6 +25,9 @@ const AddJob = () => {
   } = useSelector((store) => store.job);
   const dispatch = useDispatch();
 
+  // getting a default user location
+  const { user } = useSelector((store) => store.user);
+
   /// handle submit
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -27,14 +35,20 @@ const AddJob = () => {
       toast.error("PLease fill out all fields");
       return;
     }
+    dispatch(createJob({ position, company, jobLocation, jobType, status }));
   };
 
   /// handle onChange
   const handleJobInput = (e) => {
     const name = e.target.name;
     const value = e.target.value;
-    console.log(name, value);
+    dispatch(handleChange({ name, value }));
   };
+
+  // setting user location to job location when addJob mounts
+  useEffect(() => {
+    dispatch(handleChange({ name: "jobLocation", value: user.location }));
+  }, []);
 
   // main return
   return (
@@ -85,7 +99,7 @@ const AddJob = () => {
             <button
               type="button"
               className="btn btn-block clear-btn"
-              onClick={() => console.log("clear value")}
+              onClick={() => dispatch(clearValue())}
             >
               Clear
             </button>
