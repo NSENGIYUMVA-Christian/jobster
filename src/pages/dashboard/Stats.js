@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { showStats } from "../../features/allJobs/allJobsSlice";
 
-const Statics = () => {
+const Stats = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -11,4 +11,4 @@ const Statics = () => {
   return <div>Statics</div>;
 };
 
-export default Statics;
+export default Stats;
