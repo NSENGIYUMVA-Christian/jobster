@@ -99,6 +99,17 @@ const Register = () => {
         <button type="submit" className="btn btn-block">
           {isLoading ? "loading..." : "Submit"}
         </button>
+        <button
+          type="button"
+          className="btn btn-block btn-hipster"
+          onClick={() =>
+            dispatch(
+              loginUser({ email: "testUser@test.com", password: "secret" })
+            )
+          }
+        >
+          {isLoading ? "loading..." : "Demo app"}
+        </button>
         <p>
           {values.isMember ? "Not a member yet?" : "Already a member?"}
           <button

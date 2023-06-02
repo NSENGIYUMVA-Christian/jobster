@@ -39,7 +39,7 @@ const AddJob = () => {
     if (isEditing) {
       dispatch(
         editJob({
-          jobId: editJob,
+          jobId: editJobId,
           job: { position, company, jobLocation, jobType, status },
         })
       );
