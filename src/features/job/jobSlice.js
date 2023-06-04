@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
-import customFetch from "../../utils/axios";
+import customFetch, { checkForUnauthorizedResponse } from "../../utils/axios";
 import { getUserFromLocalStorage } from "../../utils/localStorage";
-import { logoutUser } from "../user/userSlice";
+//import { logoutUser } from "../user/userSlice";
 import { showLoading, hideLoading, getAllJobs } from "../allJobs/allJobsSlice";
 
 /// initial state
@@ -32,11 +32,12 @@ export const createJob = createAsyncThunk(
       thunkAPI.dispatch(clearValue());
       return resp.data;
     } catch (error) {
-      if (error.response.status === 401) {
-        thunkAPI.dispatch(logoutUser);
-        return thunkAPI.rejectWithValue("Unauthorized! Logging Out...");
-      }
-      return thunkAPI.rejectWithValue(error.response.data.msg);
+      return checkForUnauthorizedResponse(error, thunkAPI);
+      // if (error.response.status === 401) {
+      //   thunkAPI.dispatch(logoutUser);
+      //   return thunkAPI.rejectWithValue("Unauthorized! Logging Out...");
+      // }
+      // return thunkAPI.rejectWithValue(error.response.data.msg);
     }
   }
 );
@@ -57,7 +58,7 @@ export const deleteJob = createAsyncThunk(
       return resp.data.msg;
     } catch (error) {
       thunkAPI.dispatch(hideLoading());
-      return thunkAPI.rejectWithValue(error.response.data.msg);
+      return checkForUnauthorizedResponse(error, thunkAPI);
     }
   }
 );
@@ -75,7 +76,7 @@ export const editJob = createAsyncThunk(
       thunkAPI.dispatch(clearValue());
       return resp.data;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data.msg);
+      return checkForUnauthorizedResponse(error, thunkAPI);
     }
   }
 );

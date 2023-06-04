@@ -1,11 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
-import customFetch from "../../utils/axios";
+import customFetch, { checkForUnauthorizedResponse } from "../../utils/axios";
 import {
   addUserToLocalStorage,
   getUserFromLocalStorage,
   removeUserFromLocalStorage,
 } from "../../utils/localStorage";
+import { clearAllJobsState } from "../allJobs/allJobsSlice";
+import { clearValue } from "../job/jobSlice";
 
 // initial state
 const initialState = {
@@ -52,11 +54,22 @@ export const updateUser = createAsyncThunk(
       });
       return resp.data;
     } catch (error) {
-      if (error.response.status === 401) {
-        thunkAPI.dispatch(logoutUser());
-        return thunkAPI.rejectWithValue("Unauthorized! Logging Out...");
-      }
-      return thunkAPI.rejectWithValue(error.response.data.msg);
+      return checkForUnauthorizedResponse(error, thunkAPI);
+    }
+  }
+);
+
+/// clear all store
+export const clearStore = createAsyncThunk(
+  "user/clearStore",
+  async (message, thunkAPI) => {
+    try {
+      thunkAPI.dispatch(logoutUser(message));
+      thunkAPI.dispatch(clearAllJobsState());
+      thunkAPI.dispatch(clearValue());
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject();
     }
   }
 );
@@ -121,6 +134,9 @@ const userSlice = createSlice({
       .addCase(updateUser.rejected, (state, { payload }) => {
         state.isLoading = false;
         toast.error(payload);
+      })
+      .addCase(clearStore.rejected, () => {
+        toast.error("There was ana error");
       });
   },
 });
